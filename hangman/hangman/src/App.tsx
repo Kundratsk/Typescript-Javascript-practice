@@ -1,63 +1,116 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import words from "./wordList.json"
 import { HangmanDrawing } from './Components/HangmanDrawing'
 import { Keyboard } from './Components/Keyboard'
 import { HangmanWord } from './Components/HangmanWord'
 
 
-function App() {
-  const [wordToGuess, setWordToGuess] = useState(() => {
-    return words[Math.floor(Math.random() * words.length)]
-  })
-  const [guessedLetters, setGuessedLetters] = useState<string[]>([])
-    
-  const incorrectLetters = guessedLetters.filter(
-    letter => !wordToGuess.includes(letter) 
-)
-
-function addGuessedLetter(letter: string) {
-  if (guessedLetters.includes(letter)) return
-
-  setGuessedLetters(currentLetters => [...currentLetters, letter])
+//see funktsioon tagastab suvalise sõna wordList.json failist
+function getWord() {
+  return words[Math.floor(Math.random() * words.length)]
 }
 
-useEffect(() => {
-  const handler = (e: KeyboardEvent) => {
-    const key = e.key
-    if (!key.match(/^[a-z]$/)) return
+function App() {
 
-    e.preventDefault()
-    addGuessedLetter(key)
-  }
-
-  document.addEventListener("keypress", handler)
   
-  return () => {
-    document.removeEventListener("keypress", handler)
-  }
-}, [guessedLetters])
+  /*sõnade salvestamine array sisse on kõige lihtsam
+  stringi kasutan kuna viitan, et on tegemist ainult stringiga*/ 
+  const [wordToGuess, setWordToGuess] = useState(getWord)
+  //string on loetelu e massiivis 
+  const [guessedLetters, setGuessedLetters] = useState<string[]>([])
 
-   return (
-   <div
+  // filtreerib välja tähti, mis ei ole arvatavas sõnas
+  const inCorrectLetters = guessedLetters.filter(
+    letter => !wordToGuess.includes(letter)
+  )
+
+  //kui oled pakkunud valesid tähti kuus korda, siis kaotad
+  const isLoser = inCorrectLetters.length >= 6
+
+  //võidu sildi kuvamine
+  //kasutage spliti ja every
+  const isWinner = wordToGuess
+  .split("")
+  .every(letter => guessedLetters.includes(letter));
+
+  // see jätab meelde funktsiooni 
+  //et ei loodaks seda uuesti igas tsüklis
+const addGuessedLetter = useCallback
+  ((letter: string) => {
+    //isLoser ja isWinner ja vastavalt sellele annab tulemuse
+    if (guessedLetters.includes(letter) || isLoser || isWinner)
+      return 
+    //funktsioon on edasi antud setterile, võta praegune olek ja returni uus versioon või situatsioon
+    //funktsionaalne update, välistab buge uuenduse käigus
+    setGuessedLetters(currentLetters => [...currentLetters, letter])
+      },
+      [guessedLetters, isLoser, isWinner]
+    )
+
+    useEffect(() => {
+      const handler = (e: KeyboardEvent) =>  {
+        const key = e.key
+        if (!key.match(/^[a-z]$/)) return
+
+        e.preventDefault()
+        addGuessedLetter(key)
+      }
+
+      document.addEventListener("keypress", handler)
+
+      return () => {
+        document.removeEventListener("keypress", handler)
+      }
+    }, [guessedLetters])
+
+    useEffect(() => {
+      const handler = (e: KeyboardEvent) => {
+        const key = e.key
+        if (key !== "Enter") return
+
+        e.preventDefault()
+        setGuessedLetters([])
+        setWordToGuess(getWord())
+      }
+
+      document.addEventListener("keypress", handler)
+
+      return () => {
+        document.removeEventListener("keypress", handler)
+      }
+    }, [])
+
+  return (
+    <div
     style={{
       maxWidth: "800px",
       display: "flex",
       flexDirection: "column",
       gap: "2rem",
       margin: "0 auto",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "100vh"
-   }} 
+      alignItems: "center"
+    }}
     >
-      <div style={{ fontSize: "2rem", textAlign: "center"}}>Lose Win
+      <div style={{ fontSize: "2rem", textAlign: 'center' }}>
+        {isWinner && "Winner! - Refresh to try again"}
+        {isLoser && "Noob! - Refresh to try again"}
       </div>
-      <HangmanDrawing numberOfGuesses={incorrectLetters.length}/>
-      <HangmanWord guessedLetters={guessedLetters} wordToGuess={wordToGuess} />
-      <div style={{ alignSelf: "stretch"}}>
-      <Keyboard />
+
+      {/* Kutsume esile erinevad komponendid */}
+      <HangmanDrawing numberOfGuesses={inCorrectLetters.length} />
+      <HangmanWord guessedLetters={guessedLetters} wordToGuess = {wordToGuess} />
+
+      <div style={{ alignSelf: "stretch"}} >
+          <Keyboard 
+            activeLetters={guessedLetters.filter(letter =>
+            wordToGuess.includes(letter)
+          )}
+            inactiveLetters={inCorrectLetters}
+            addGuessedLetter={addGuessedLetter}   
+          />
       </div>
-   </div>
+
+    </div>
   )
 }
 
