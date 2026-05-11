@@ -1,6 +1,9 @@
 
-let name = 'Kristo';
-console.log(name);
+let firstName = "Kristo"
+let lastName = "Kangur"
+
+let fullName = firstName.concat(" ", lastName)
+console.log(fullName)
 
 // Cannot be a reserved keyword
 // Should be meaningful
