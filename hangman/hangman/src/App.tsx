@@ -1,117 +1,112 @@
-import { useCallback, useEffect, useState } from 'react'
-import words from "./wordList.json"
-import { HangmanDrawing } from './Components/HangmanDrawing'
-import { Keyboard } from './Components/Keyboard'
-import { HangmanWord } from './Components/HangmanWord'
-
+import { useCallback, useEffect, useState } from "react";
+import words from "./wordList.json";
+import { HangmanDrawing } from "./Components/HangmanDrawing";
+import { Keyboard } from "./Components/Keyboard";
+import { HangmanWord } from "./Components/HangmanWord";
 
 //see funktsioon tagastab suvalise sõna wordList.json failist
 function getWord() {
-  return words[Math.floor(Math.random() * words.length)]
+  return words[Math.floor(Math.random() * words.length)];
 }
 
 function App() {
-
-  
   /*sõnade salvestamine array sisse on kõige lihtsam
-  stringi kasutan kuna viitan, et on tegemist ainult stringiga*/ 
-  const [wordToGuess, setWordToGuess] = useState(getWord)
-  //string on loetelu e massiivis 
-  const [guessedLetters, setGuessedLetters] = useState<string[]>([])
+  stringi kasutan kuna viitan, et on tegemist ainult stringiga*/
+  const [wordToGuess, setWordToGuess] = useState(getWord);
+  //string on loetelu e massiivis
+  const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
 
   // filtreerib välja tähti, mis ei ole arvatavas sõnas
   const inCorrectLetters = guessedLetters.filter(
-    letter => !wordToGuess.includes(letter)
-  )
+    (letter) => !wordToGuess.includes(letter),
+  );
 
   //kui oled pakkunud valesid tähti kuus korda, siis kaotad
-  const isLoser = inCorrectLetters.length >= 6
+  const isLoser = inCorrectLetters.length >= 6;
 
   //võidu sildi kuvamine
   //kasutage spliti ja every
   const isWinner = wordToGuess
-  .split("")
-  .every(letter => guessedLetters.includes(letter));
+    .split("")
+    .every((letter) => guessedLetters.includes(letter));
 
-  // see jätab meelde funktsiooni 
+  // see jätab meelde funktsiooni
   //et ei loodaks seda uuesti igas tsüklis
-const addGuessedLetter = useCallback
-  ((letter: string) => {
-    //isLoser ja isWinner ja vastavalt sellele annab tulemuse
-    if (guessedLetters.includes(letter) || isLoser || isWinner)
-      return 
-    //funktsioon on edasi antud setterile, võta praegune olek ja returni uus versioon või situatsioon
-    //funktsionaalne update, välistab buge uuenduse käigus
-    setGuessedLetters(currentLetters => [...currentLetters, letter])
-      },
-      [guessedLetters, isLoser, isWinner]
-    )
+  const addGuessedLetter = useCallback(
+    (letter: string) => {
+      //isLoser ja isWinner ja vastavalt sellele annab tulemuse
+      if (guessedLetters.includes(letter) || isLoser || isWinner) return;
+      //funktsioon on edasi antud setterile, võta praegune olek ja returni uus versioon või situatsioon
+      //funktsionaalne update, välistab buge uuenduse käigus
+      setGuessedLetters((currentLetters) => [...currentLetters, letter]);
+    },
+    [guessedLetters, isLoser, isWinner],
+  );
 
-    useEffect(() => {
-      const handler = (e: KeyboardEvent) =>  {
-        const key = e.key
-        if (!key.match(/^[a-z]$/)) return
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const key = e.key;
+      if (!key.match(/^[a-z]$/)) return;
 
-        e.preventDefault()
-        addGuessedLetter(key)
-      }
+      e.preventDefault();
+      addGuessedLetter(key);
+    };
 
-      document.addEventListener("keypress", handler)
+    document.addEventListener("keypress", handler);
 
-      return () => {
-        document.removeEventListener("keypress", handler)
-      }
-    }, [guessedLetters])
+    return () => {
+      document.removeEventListener("keypress", handler);
+    };
+  }, [guessedLetters]);
 
-    useEffect(() => {
-      const handler = (e: KeyboardEvent) => {
-        const key = e.key
-        if (key !== "Enter") return
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const key = e.key;
+      if (key !== "Enter") return;
 
-        e.preventDefault()
-        setGuessedLetters([])
-        setWordToGuess(getWord())
-      }
+      e.preventDefault();
+      setGuessedLetters([]);
+      setWordToGuess(getWord());
+    };
 
-      document.addEventListener("keypress", handler)
+    document.addEventListener("keypress", handler);
 
-      return () => {
-        document.removeEventListener("keypress", handler)
-      }
-    }, [])
+    return () => {
+      document.removeEventListener("keypress", handler);
+    };
+  }, []);
 
   return (
     <div
-    style={{
-      maxWidth: "800px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "2rem",
-      margin: "0 auto",
-      alignItems: "center"
-    }}
+      style={{
+        maxWidth: "800px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "2rem",
+        margin: "0 auto",
+        alignItems: "center",
+      }}
     >
-      <div style={{ fontSize: "2rem", textAlign: 'center' }}>
+      <div style={{ fontSize: "2rem", textAlign: "center" }}>
         {isWinner && "Winner! - Refresh to try again"}
         {isLoser && "Noob! - Refresh to try again"}
       </div>
 
       {/* Kutsume esile erinevad komponendid */}
       <HangmanDrawing numberOfGuesses={inCorrectLetters.length} />
-      <HangmanWord guessedLetters={guessedLetters} wordToGuess = {wordToGuess} />
+      <HangmanWord guessedLetters={guessedLetters} wordToGuess={wordToGuess} />
 
-      <div style={{ alignSelf: "stretch"}} >
-          <Keyboard 
-            activeLetters={guessedLetters.filter(letter =>
-            wordToGuess.includes(letter)
+      <div style={{ alignSelf: "stretch" }}>
+        <Keyboard
+          activeLetters={guessedLetters.filter((letter) =>
+            wordToGuess.includes(letter),
           )}
-            inactiveLetters={inCorrectLetters}
-            addGuessedLetter={addGuessedLetter}   
-          />
+          inactiveLetters={inCorrectLetters}
+          addGuessedLetter={addGuessedLetter}
+        />
       </div>
-
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
