@@ -1,0 +1,19 @@
+.button {
+  background-color: hsl(51, 46%, 68%);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+.button:hover {
+  background-color: hsl(51, 46%, 58%);
+}
+.div {
+  margin-top: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
