@@ -1,11 +1,17 @@
 import "../css/MovieCard.css";
 import {useNavigate} from 'react-router-dom'
+import { useMovieContext } from "../contexts/MovieContext";
 
 function MovieCard({ movie }) {
 
+const {isFavorite, addToFavorites, removeFromFavorites} = useMovieContext()
 
-  function onFavoriteClick() {
-    alert("clicked");
+const favorite = isFavorite(movie.id)
+
+  function onFavoriteClick(e) {
+    e.preventDefault()
+    if (favorite) removeFromFavorites(movie.id)
+      else addToFavorites(movie)
   }
 
   
@@ -19,7 +25,7 @@ function MovieCard({ movie }) {
         />
 
         <div className="movie-overlay">
-          <button className="favorite-btn" onClick={onFavoriteClick}>
+          <button className={`favorite-btn ${favorite ? "active" : ""}`} onClick={onFavoriteClick}>
             🤍
           </button>
         </div>
