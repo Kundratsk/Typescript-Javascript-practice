@@ -9,9 +9,13 @@ const {isFavorite, addToFavorites, removeFromFavorites} = useMovieContext()
 const favorite = isFavorite(movie.id)
 
   function onFavoriteClick(e) {
-    e.preventDefault()
-    if (favorite) removeFromFavorites(movie.id)
-      else addToFavorites(movie)
+    e.preventDefault();
+
+    if (favorite) {
+      removeFromFavorites(movie.id);
+    } else {
+      addToFavorites(movie);
+    }
   }
 
   
@@ -26,7 +30,7 @@ const favorite = isFavorite(movie.id)
 
         <div className="movie-overlay">
           <button className={`favorite-btn ${favorite ? "active" : ""}`} onClick={onFavoriteClick}>
-            🤍
+            ♥
           </button>
         </div>
       </div>
