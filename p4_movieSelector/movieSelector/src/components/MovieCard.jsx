@@ -1,9 +1,16 @@
 import "../css/MovieCard.css";
+import {useNavigate} from 'react-router-dom'
 
 function MovieCard({ movie }) {
+
+  const navigate = useNavigate();
+
+
   function onFavoriteClick() {
-    alert("clicked");
+    navigate('/home');
   }
+
+  
 
   return (
     <div className="movie-card">
