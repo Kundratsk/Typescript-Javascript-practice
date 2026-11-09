@@ -17,7 +17,7 @@ This repository documents my progress as a developer. It includes everything fro
 ### Applications
 
 - **Weather App** — A weather application.
-- **IP Calculator** — An IP address calculator.
+- **IP Calculator** —  iphone calculator.
 - **Text to Speech** — A text-to-speech application.
 - **Movie Selector** — An application for selecting movies.
 - **Hangman** — A classic word-guessing game.
