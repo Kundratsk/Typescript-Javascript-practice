@@ -3,11 +3,9 @@ import {useNavigate} from 'react-router-dom'
 
 function MovieCard({ movie }) {
 
-  const navigate = useNavigate();
-
 
   function onFavoriteClick() {
-    navigate('/home');
+    alert("clicked");
   }
 
   
